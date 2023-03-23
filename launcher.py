@@ -1,28 +1,54 @@
-import sys
-import os
-import time
 import configparser
+import time
 
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
+import pythonping
 
-from Common.LogManager import LogManager
-from Store.MainStore import MainStore
-from Handler.MainHandler import MainHandler
+from Modules.Handler import Handler
+from Modules.Logger import Logger
+from Modules.Store import Store
+from Modules.Transport import Transport
 
 config = configparser.ConfigParser()
-config.read("Assets/watchman_core.cfg")
+config.read("core.cfg")
 
-lgm = LogManager(config)
-lgm.init("Запускаюсь...")
-m_store = MainStore(config, lgm)
+LG = Logger()
+ST = Store()
+HD = Handler(config, ST, LG)
+TR = Transport(config, ST, LG)
 
-MainHandler(m_store).local_init()
+boot_lock = True
+#
+# try:
+#     response_list = pythonping.ping('8.8.8.8', size=10, count=2, timeout=2)
+#     ping = response_list.rtt_avg_ms
+#     if ping < 2000:
+#         LG.log("Пинг до Google (наличие сети): "+str(ping)+" ms")
+#         boot_lock = True
+#     else:
+#         LG.err("Ошибка подключения к сети: превышено время ожидания (2000ms).")
+#         boot_lock = False
+# except Exception as e:
+#     LG.err("Ошибка обнаружения сети: "+str(e))
+#     boot_lock = False
+#
+# if boot_lock:
+#     try:
+#         response_list = pythonping.ping(config['network']['base_url'], size=10, count=2, timeout=2)
+#         ping = response_list.rtt_avg_ms
+#         if ping < 2000:
+#             LG.log("Пинг до серверов Navigine: "+str(ping)+" ms")
+#             boot_lock = True
+#         else:
+#             LG.err("Ошибка подключения к серверам Navigine: превышено время ожидания (2000ms).")
+#             boot_lock = False
+#     except Exception as e:
+#         LG.err("Ошибка подключения к серверам Navigine: "+str(e))
 
-try:
+if boot_lock:
+    HD.start()
+    TR.start()
+
     while True:
-        time.sleep(0.1)
-except KeyboardInterrupt as e:
-    lgm.log('KeyboardInterrupt, остановлено пользователем')
-    lgm.__del__()
+        time.sleep(1)
+        #print(ST)
+
