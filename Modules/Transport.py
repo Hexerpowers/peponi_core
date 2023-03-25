@@ -1,18 +1,7 @@
 from threading import Thread
 
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Request
 import uvicorn
-
-
-class Dimensions(BaseModel):
-    field_width: str
-    field_height: str
-
-
-class Telemetry(BaseModel):
-    charge_level: str
-    signal_strength: str
 
 
 class Transport:
@@ -27,49 +16,56 @@ class Transport:
     def start(self):
         self.server_loop.start()
 
+    @staticmethod
+    def sanitize(position):
+        return {
+            "pos_x":0,
+            "pos_y":0
+        }
+
     def serve(self):
-        @self.api.get("/api/v1/status")
-        async def status_get():
+        @self.api.get("/api/v1/get/status")
+        async def get_status():
             return {"status": "OK"}
 
-        @self.api.get("/api/v1/get_position")
-        async def position_get():
+        @self.api.get("/api/v1/get/position")
+        async def get_position():
             return {
-                "status": "OK",
-                "position": self.st.get_position(),
+                "position": self.st.get_position(0),
+                "accuracy": self.st.get_accuracy()
             }
 
-        @self.api.get("/api/v1/get_telemetry")
-        async def telemetry_get():
+        @self.api.get("/api/v1/get/telemetry")
+        async def get_telemetry():
             return {
-                "status": "OK",
                 "telemetry": self.st.get_telemetry(),
             }
 
-        @self.api.post("/api/v1/set_dimens")
-        async def dimens_set(dimensions: Dimensions):
-            self.st.set_dimens(
-                field_width=dimensions.field_width,
-                field_height=dimensions.field_height,
-                offset_x=0,
-                offset_y=0.45,
-                magic_x=5000,
-                magic_y=3637
+        @self.api.post("/api/v1/set/position")
+        async def set_position(position: Request):
+            req_info = await position.json()
+            san_position = self.sanitize(req_info)
+            self.st.set_position(2, self.st.get_position(1))
+            self.st.set_position(1, self.st.get_position(0))
+            self.st.set_position(
+                san_position['pos_x'],
+                san_position['pos_y']
             )
-            return {
-                "status": "OK",
-                "dimensions": self.st.get_params(),
-            }
+            return {"status": "OK"}
 
-        @self.api.post("/api/v1/set_telemetry")
-        async def telemetry_set(telemetry: Telemetry):
+        @self.api.post("/api/v1/set/telemetry")
+        async def set_telemetry(telemetry: Request):
+            req_info = await telemetry.json()
             self.st.set_telemetry(
-                charge_level=telemetry.charge_level,
-                signal_strength=telemetry.signal_strength
+                charge_level=req_info['charge_level'],
+                signal_strength=req_info['signal_strength']
             )
-            return {
-                "status": "OK",
-                "dimensions": self.st.get_telemetry(),
-            }
+            return {"status": "OK"}
 
-        uvicorn.run(self.api, host="0.0.0.0", port=8000)
+        @self.api.post("/api/v1/set/route")
+        async def set_route(route: Request):
+            req_info = await route.json()
+            self.st.set_route(req_info['route'])
+            return {"status": "OK"}
+
+        uvicorn.run(self.api, host="0.0.0.0", port=5252)

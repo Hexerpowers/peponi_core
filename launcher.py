@@ -1,6 +1,5 @@
 import configparser
 import time
-import pythonping
 
 from Modules.Handler import Handler
 from Modules.Logger import Logger
@@ -12,18 +11,15 @@ config = configparser.ConfigParser()
 config.read("core.cfg")
 
 LG = Logger()
-ST = Store()
+ST = Store(config)
 HD = Handler(config, ST, LG)
 TR = Transport(config, ST, LG)
 NW = Network(config, ST, LG)
 
-# NW.wait_for_connection()
-NW.ping_inet()
-boot_lock = NW.ping_server()
+NW.wait_for_connection()
 
-if boot_lock or config['general']['mode'] == 'test':
-    HD.start()
-    TR.start()
+HD.start()
+TR.start()
 
-    while True:
-        time.sleep(1)
+while True:
+    time.sleep(1)
