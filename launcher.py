@@ -21,5 +21,8 @@ NW.wait_for_connection()
 HD.start()
 TR.start()
 
-while True:
-    time.sleep(1)
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt as e:
+    LG.log('KeyboardInterrupt, остановлено пользователем')

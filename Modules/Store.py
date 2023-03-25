@@ -7,7 +7,8 @@ class Store:
             self.position = {
                 'pos_x': random.randint(0, 12000),
                 'pos_y': random.randint(0, 3000),
-                'pos_t': random.randint(0, 360)
+                'pos_t': random.randint(0, 360),
+                'accuracy': 0,
             }
         else:
             self.position = {
@@ -31,10 +32,20 @@ class Store:
             "signal_strength": 0,
         }
 
-        self.runtime = {
-            "route": {},
-            "accuracy": 0
-        }
+        if config['general']['mode'] == 'sim':
+            self.runtime = {
+                "state": False,
+                "route": {
+                    "repeat": True,
+                    "waypoints":[[1000,2000], [5000,2000]]
+                },
+                "accuracy": 0
+            }
+        else:
+            self.runtime = {
+                "state": False,
+                "route": {}
+            }
 
     def __str__(self):
         return "Position: " + str(self.position) + "\nTelemetry: " + str(self.telemetry)
