@@ -34,13 +34,11 @@ class Store:
     def set_angle(self, pos_a):
         self.position['pos_a'] = int(pos_a)
 
-    def get_position(self):
-        return self.position
-
     def set_accuracy(self, accuracy):
         self.position['accuracy'] = int(accuracy)
 
-    def get_accuracy(self): return self.position['accuracy']
+    def get_position(self):
+        return self.position
 
     def set_telemetry(self, charge_level, signal_strength):
         self.telemetry['charge_level'] = int(charge_level)
