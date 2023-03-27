@@ -44,12 +44,6 @@ class Transport:
                 "position": self.st.get_position(0)
             }
 
-        @self.api.get("/api/v1/get/telemetry")
-        async def get_telemetry():
-            return {
-                "telemetry": self.st.get_telemetry(),
-            }
-
         @self.api.get("/api/v1/get/runtime")
         async def get_runtime():
             return {
@@ -67,15 +61,6 @@ class Transport:
                 san_position['pos_y']
             )
             self.st.set_position_timestamp(math.floor(time.time()))
-            return {"status": "OK"}
-
-        @self.api.post("/api/v1/set/telemetry")
-        async def set_telemetry(telemetry: Request):
-            req_info = await telemetry.json()
-            self.st.set_telemetry(
-                charge_level=req_info['charge_level'],
-                signal_strength=req_info['signal_strength']
-            )
             return {"status": "OK"}
 
         @self.api.post("/api/v1/set/route")

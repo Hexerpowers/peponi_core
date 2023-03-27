@@ -27,11 +27,6 @@ class Store:
             'pos_y': 0
         }
 
-        self.telemetry = {
-            "charge_level": 0,
-            "signal_strength": 0,
-        }
-
         if config['general']['mode'] == 'sim':
             self.runtime = {
                 "state": False,
@@ -74,10 +69,6 @@ class Store:
     def set_accuracy(self, accuracy):
         self.position['accuracy'] = int(accuracy)
 
-    def set_telemetry(self, charge_level, signal_strength):
-        self.telemetry['charge_level'] = int(charge_level)
-        self.telemetry['signal_strength'] = int(signal_strength)
-
     def set_route(self, route):
         self.runtime['route'] = route
 
@@ -104,9 +95,6 @@ class Store:
             return self.p_position
         if time == 2:
             return self.pp_position
-
-    def get_telemetry(self):
-        return self.telemetry
 
     def get_runtime(self):
         return self.runtime
