@@ -1,3 +1,4 @@
+import math
 import time
 from threading import Thread
 
@@ -23,5 +24,15 @@ class Handler:
             acc_y = abs(pos['pos_y']-(pos['pos_y']+p_pos['pos_y']+pp_pos['pos_y'])/3)
 
             self.st.set_accuracy(max(acc_x, acc_y))
+
+            position_ok = False
+            robot_ok = False
+            tracking = self.st.get_tracking()
+            if math.floor(time.time()) - tracking['position_timestamp'] < 3:
+                position_ok = True
+            if math.floor(time.time()) - tracking['robot_timestamp'] < 3:
+                robot_ok = True
+
+            self.st.set_tracking_ok(position_ok, robot_ok)
 
 

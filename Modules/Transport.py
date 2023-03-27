@@ -1,3 +1,5 @@
+import math
+import time
 from threading import Thread
 
 from fastapi import FastAPI, Request
@@ -19,19 +21,25 @@ class Transport:
     @staticmethod
     def sanitize(position):
         return {
-            "pos_x":0,
-            "pos_y":0
+            "pos_x": 0,
+            "pos_y": 0
         }
 
     def serve(self):
         @self.api.get("/api/v1/get/status")
         async def get_status():
-            return {"status": "OK"}
+            tracking = self.st.get_tracking()
+            return {
+                "status": "OK",
+                "position": tracking["position_ok"],
+                "robot": tracking['robot_ok']
+            }
 
         @self.api.post("/api/v1/get/position")
         async def get_position(data: Request):
             theta = await data.json()
             self.st.set_theta(theta['theta'])
+            self.st.set_robot_timestamp(math.floor(time.time()))
             return {
                 "position": self.st.get_position(0)
             }
@@ -58,6 +66,7 @@ class Transport:
                 san_position['pos_x'],
                 san_position['pos_y']
             )
+            self.st.set_position_timestamp(math.floor(time.time()))
             return {"status": "OK"}
 
         @self.api.post("/api/v1/set/telemetry")
@@ -73,6 +82,12 @@ class Transport:
         async def set_route(route: Request):
             req_info = await route.json()
             self.st.set_route(req_info['route'])
+            return {"status": "OK"}
+
+        @self.api.post("/api/v1/set/state")
+        async def set_route(route: Request):
+            req_info = await route.json()
+            self.st.set_state(req_info['state'])
             return {"status": "OK"}
 
         self.lg.log("Принимаю запросы...")

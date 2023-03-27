@@ -37,7 +37,7 @@ class Store:
                 "state": False,
                 "route": {
                     "repeat": True,
-                    "waypoints":[[1000,2000], [5000,2000]]
+                    "waypoints": [[1000, 2000], [5000, 2000]]
                 },
                 "accuracy": 0
             }
@@ -46,6 +46,13 @@ class Store:
                 "state": False,
                 "route": {}
             }
+
+        self.tracking = {
+            "position_timestamp": "",
+            "robot_timestamp": "",
+            "position_ok": False,
+            "robot_ok": False
+        }
 
     def __str__(self):
         return "Position: " + str(self.position) + "\nTelemetry: " + str(self.telemetry)
@@ -74,6 +81,22 @@ class Store:
     def set_route(self, route):
         self.runtime['route'] = route
 
+    def set_state(self, state):
+        self.runtime['state'] = bool(state)
+
+    def set_position_timestamp(self, timestamp):
+        self.tracking['position_timestamp'] = timestamp
+
+    def set_robot_timestamp(self, timestamp):
+        self.tracking['robot_timestamp'] = timestamp
+
+    def set_tracking_ok(self, position_ok, robot_ok):
+        self.tracking['position_ok'] = position_ok
+        self.tracking['robot_ok'] = robot_ok
+
+    def get_tracking(self):
+        return self.tracking
+
     def get_position(self, time):
         if time == 0:
             return self.position
@@ -82,6 +105,8 @@ class Store:
         if time == 2:
             return self.pp_position
 
-    def get_telemetry(self): return self.telemetry
+    def get_telemetry(self):
+        return self.telemetry
 
-    def get_runtime(self): return self.runtime
+    def get_runtime(self):
+        return self.runtime
