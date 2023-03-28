@@ -43,8 +43,8 @@ class Store:
             }
 
         self.tracking = {
-            "position_timestamp": "",
-            "robot_timestamp": "",
+            "position_timestamp": 0,
+            "robot_timestamp": 0,
             "position_ok": False,
             "robot_ok": False
         }

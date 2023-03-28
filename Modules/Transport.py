@@ -31,15 +31,21 @@ class Transport:
             tracking = self.st.get_tracking()
             return {
                 "status": "OK",
-                "position": tracking["position_ok"],
-                "robot": tracking['robot_ok']
+                "position_ok": tracking["position_ok"],
+                "robot_ok": tracking['robot_ok']
             }
 
-        @self.api.post("/api/v1/get/position")
-        async def get_position(data: Request):
+        @self.api.post("/api/v1/get/position_n_theta")
+        async def get_position_set_theta(data: Request):
             theta = await data.json()
             self.st.set_theta(theta['theta'])
             self.st.set_robot_timestamp(math.floor(time.time()))
+            return {
+                "position": self.st.get_position(0)
+            }
+
+        @self.api.get("/api/v1/get/position")
+        async def get_position():
             return {
                 "position": self.st.get_position(0)
             }
@@ -76,4 +82,4 @@ class Transport:
             return {"status": "OK"}
 
         self.lg.log("Принимаю запросы...")
-        uvicorn.run(self.api, host="0.0.0.0", port=5252, log_level="critical")
+        uvicorn.run(self.api, host="0.0.0.0", port=5052, log_level="critical")
