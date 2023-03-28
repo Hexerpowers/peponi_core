@@ -50,7 +50,7 @@ class Store:
         }
 
     def __str__(self):
-        return "Position: " + str(self.position) + "\nTelemetry: " + str(self.telemetry)
+        return "Position: " + str(self.position)
 
     def set_position(self, time, pos_x, pos_y):
         if time == 0:
