@@ -22,8 +22,8 @@ class Handler:
         self.main_loop.start()
         self.hank_loop.start()
         self.power_loop.start()
-        # KeyboardHandler(self.st, self.lg).start()
-        VideoHandler(self.st, self.lg).start()
+        KeyboardHandler(self.st, self.lg).start()
+        # VideoHandler(self.st, self.lg).start()
 
     def main(self):
         while True:
@@ -60,7 +60,7 @@ class Handler:
         while True:
             time.sleep(0.5)
             try:
-                req = requests.get('http://127.0.0.1:5052/api/v1/get/power', timeout=1)
+                req = requests.get('http://192.168.22.13:5052/api/v1/get/power', timeout=1)
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)

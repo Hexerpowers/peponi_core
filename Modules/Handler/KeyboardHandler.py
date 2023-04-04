@@ -68,7 +68,8 @@ class KeyboardHandler:
             time.sleep(0.2)
             if self.st.get_manual():
                 try:
-                    req = requests.post('http://127.0.0.1:5252', data=json.dumps({"x": str(self.x), "y": str(self.y)}),
-                                        timeout=0.5)
+                    req = requests.post('http://192.168.22.13:5052/api/v1/post/move',
+                                        data=json.dumps({"x": str(self.x), "y": str(self.y)}),
+                                        timeout=2)
                 except Exception as e:
                     pass
