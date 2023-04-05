@@ -3,7 +3,6 @@ import time
 from threading import Thread
 
 import keyboard
-import py_win_keyboard_layout
 import requests
 import win32api
 import win32con
@@ -15,11 +14,6 @@ class KeyboardHandler:
         self.st = st
         self.lg = lg
 
-        # Включаем английскую раскладку и NumLock
-        py_win_keyboard_layout.change_foreground_window_keyboard_layout(0x04090409)
-        if self.is_num_lock_on() != 1:
-            keyboard.press_and_release('num lock')
-
         self.x = 0
         self.y = 0
 
@@ -30,10 +24,6 @@ class KeyboardHandler:
         self.upd_loop.start()
         self.send_loop.start()
         return self
-
-    @staticmethod
-    def is_num_lock_on():
-        return win32api.GetKeyState(win32con.VK_NUMLOCK)
 
     def detect_key(self, e):
         if e.event_type == 'down' and e.name == 'up':
@@ -68,8 +58,8 @@ class KeyboardHandler:
             time.sleep(0.2)
             if self.st.get_manual():
                 try:
-                    req = requests.post('http://192.168.22.13:5052/api/v1/post/move',
-                                        data=json.dumps({"x": str(self.x), "y": str(self.y)}),
-                                        timeout=2)
+                    req = requests.post(
+                        'http://' + self.st.config['network']['endpoint_addr'] + ':5052/api/v1/post/move',
+                        data=json.dumps({"x": str(self.x), "y": str(self.y)}), timeout=2)
                 except Exception as e:
                     pass

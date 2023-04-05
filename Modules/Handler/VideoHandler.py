@@ -1,9 +1,8 @@
 import subprocess as sp
-import time
 from time import gmtime, strftime
 
 
-class VideoHandler():
+class VideoHandler:
     def __init__(self, st, lg):
         self.st = st
         self.lg = lg
