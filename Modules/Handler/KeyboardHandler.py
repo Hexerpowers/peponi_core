@@ -4,8 +4,6 @@ from threading import Thread
 
 import keyboard
 import requests
-import win32api
-import win32con
 
 
 class KeyboardHandler:
