@@ -38,8 +38,13 @@ class HttpServer:
         @self.api.get("/api/v1/trig/record")
         async def trig_record():
             self.st.toggle_record()
+            if self.st.get_record():
+                result = "on"
+            else:
+                result = "off"
             return {
-                "status": "OK"
+                "status": "OK",
+                "result": result
             }
 
         @self.api.get("/api/v1/get/status")
