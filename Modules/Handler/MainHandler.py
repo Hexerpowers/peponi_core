@@ -38,7 +38,8 @@ class Handler:
                         "state": 1,
                         "direction": json_resp['direction'],
                         "load": json_resp['load'],
-                        "length": self.calc_length(json_resp['turns'])
+                        "length": self.calc_length(json_resp['turns']),
+                        "op_time": json_resp['op_time'],
                     })
                     self.st.set_power(json_resp['power'])
             except Exception as e:
@@ -46,14 +47,15 @@ class Handler:
                     "state": 0,
                     "direction": 0,
                     "load": 0,
-                    "length": 0
+                    "length": 0,
+                    "op_time": 0
                 })
 
     def power(self):
         while True:
             time.sleep(0.5)
             try:
-                req = requests.get('http://'+self.config['network']['endpoint_addr']+':5052/api/v1/get/power', timeout=1)
+                req = requests.get('http://'+self.st.get_endp_addr()+':5052/api/v1/get/power', timeout=1)
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)
@@ -64,7 +66,7 @@ class Handler:
                     })
             except Exception as e:
                 self.st.set_power({
-                    "state": 0,
+                    "state": 1,
                     "voltage": 0,
                     "current": 0,
                 })

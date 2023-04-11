@@ -35,6 +35,13 @@ class HttpServer:
                 "status": "OK"
             }
 
+        @self.api.get("/api/v1/trig/record")
+        async def trig_record():
+            self.st.toggle_record()
+            return {
+                "status": "OK"
+            }
+
         @self.api.get("/api/v1/get/status")
         async def get_status():
             return {
@@ -44,6 +51,7 @@ class HttpServer:
         @self.api.get("/api/v1/get/power")
         async def get_power():
             return {
+                "status": "OK",
                 "state": self.st.get_power()['state'],
                 "voltage": self.st.get_power()['voltage'],
                 "current": self.st.get_power()['current']
@@ -56,12 +64,21 @@ class HttpServer:
                 "direction": self.st.get_hank()['direction'],
                 "load": self.st.get_hank()['load'],
                 "length": self.st.get_hank()['length'],
+                "op_time": self.st.get_hank()['op_time']
             }
 
         @self.api.post("/api/v1/post/path")
         async def post_path(data: Request):
             datum = await data.json()
             self.st.set_path(datum['path'])
+            return {
+                "status": "OK"
+            }
+
+        @self.api.post("/api/v1/post/addr")
+        async def post_addr(data: Request):
+            datum = await data.json()
+            self.st.set_endp_addr(datum['addr'])
             return {
                 "status": "OK"
             }

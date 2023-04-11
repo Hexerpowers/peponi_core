@@ -15,15 +15,23 @@ class Store:
             "state": 0,
             "direction": 0,
             "load": 0,
-            "length": 0
+            "length": 0,
+            "op_time": 0
         }
 
+        self.endp_addr = self.config['network']['endpoint_addr']
+
         self.manual = False
+
+        self.record = False
 
         self.path = "C:\Watchman\Camera"
 
     def toggle_manual(self):
         self.manual = not self.manual
+
+    def toggle_record(self):
+        self.record = not self.record
 
     def get_manual(self):
         return self.manual
@@ -37,6 +45,12 @@ class Store:
     def get_path(self):
         return self.path
 
+    def get_endp_addr(self):
+        return self.endp_addr
+
+    def get_record(self):
+        return self.record
+
     def set_power(self, power):
         self.power = power
 
@@ -45,3 +59,6 @@ class Store:
 
     def set_path(self, path):
         self.path = path
+
+    def set_endp_addr(self, addr):
+        self.endp_addr = addr
