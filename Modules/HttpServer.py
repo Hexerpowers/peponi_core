@@ -72,18 +72,11 @@ class HttpServer:
                 "op_time": self.st.get_hank()['op_time']
             }
 
-        @self.api.post("/api/v1/post/path")
+        @self.api.post("/api/v1/post/settings")
         async def post_path(data: Request):
             datum = await data.json()
-            self.st.set_path(datum['path'])
-            return {
-                "status": "OK"
-            }
-
-        @self.api.post("/api/v1/post/addr")
-        async def post_addr(data: Request):
-            datum = await data.json()
-            self.st.set_endp_addr(datum['addr'])
+            self.st.set_path(datum['camera_path'])
+            self.st.set_endp_addr(datum['endpoint_address'])
             return {
                 "status": "OK"
             }

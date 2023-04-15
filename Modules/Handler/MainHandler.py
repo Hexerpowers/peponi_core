@@ -70,16 +70,16 @@ class Handler:
 
     def power(self):
         while True:
-            time.sleep(0.5)
+            time.sleep(1)
             try:
-                req = requests.get('http://' + self.st.get_endp_addr() + ':5052/api/v1/get/power', timeout=1)
+                req = requests.get('http://' + self.st.get_endp_addr() + ':5052/api/v1/get/power', timeout=2)
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)
                     self.st.set_power({
-                        "state": json_resp['state'],
-                        "voltage": json_resp['voltage'],
-                        "current": json_resp['current'],
+                        "state": int(json_resp['state']),
+                        "voltage": float(json_resp['voltage']),
+                        "current": float(json_resp['current']),
                     })
             except Exception as e:
                 self.st.set_power({
