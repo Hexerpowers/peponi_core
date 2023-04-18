@@ -71,12 +71,12 @@ class KeyboardHandler:
             self.x = 0
 
         if e.event_type == 'down' and e.name == 'left':
-            self.y = 1
+            self.y = -1
         if e.event_type == 'up' and e.name == 'left':
             self.y = 0
 
         if e.event_type == 'down' and e.name == 'right':
-            self.y = -1
+            self.y = 1
         if e.event_type == 'up' and e.name == 'right':
             self.y = 0
 
