@@ -21,7 +21,7 @@ class Handler:
         # self.hank_loop.start()
         self.power_loop.start()
         KeyboardHandler(self.st, self.lg).start()
-        # VideoHandler(self.st, self.lg).start()
+        VideoHandler(self.st, self.lg).start()
 
     @staticmethod
     def calc_length(n):
