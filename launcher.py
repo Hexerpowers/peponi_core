@@ -13,7 +13,7 @@ from Modules.Store import Store
 from Modules.HttpServer import HttpServer
 
 config = configparser.ConfigParser()
-config.read("core.cfg")
+config.read(os.path.dirname(os.path.abspath(__file__))+"/core.cfg")
 
 LG = Logger(config)
 ST = Store(config)
