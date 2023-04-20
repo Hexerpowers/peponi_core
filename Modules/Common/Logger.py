@@ -9,9 +9,9 @@ class Logger:
         self.cls = Console()
         self.log_list = ''''''
         if config['general']['log'] == 'clear':
-            self.log_file = open(os.path.dirname(os.path.abspath(__file__))+'/../../log.txt', 'w+')
+            self.log_file = open(os.path.dirname(os.path.abspath(__file__)) + '/../../log.txt', 'w+')
         else:
-            self.log_file = open(os.path.dirname(os.path.abspath(__file__))+'/../../log.txt', 'a+')
+            self.log_file = open(os.path.dirname(os.path.abspath(__file__)) + '/../../log.txt', 'a+')
         self.log_file.write("---------------STARTUP---------------\n")
 
     def __del__(self):

@@ -1,6 +1,3 @@
-import random
-
-
 class Store:
     def __init__(self, config):
         self.config = config

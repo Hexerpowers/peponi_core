@@ -14,18 +14,19 @@ class Handler:
         self.config = config
         self.st = st
         self.lg = lg
+        self.power_is = 0
         self.hank_loop = Thread(target=self.hank, daemon=True, args=())
         self.power_loop = Thread(target=self.power, daemon=True, args=())
 
     def start(self):
-        # self.hank_loop.start()
+        self.hank_loop.start()
         self.power_loop.start()
         KeyboardHandler(self.st, self.lg).start()
         VideoHandler(self.st, self.lg).start()
 
     @staticmethod
     def calc_length(n):
-        n=float(n)
+        n = float(n)
         d = 0.006
         l = 0.32
         r = 0.275 / 2
@@ -37,11 +38,11 @@ class Handler:
 
     @staticmethod
     def calc_load(m):
-        m=int(m)
-        if m<0:
+        m = int(m)
+        if m < 0:
             return 0
         else:
-            return round((m/100000), 1)
+            return round((m / 100000), 1)
 
     def hank(self):
         while True:
@@ -51,15 +52,16 @@ class Handler:
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)
+                    self.power_is = 1
                     self.st.set_hank({
                         "state": 1,
                         "direction": json_resp['direction'],
                         "load": self.calc_load(json_resp['load']),
                         "length": self.calc_length(json_resp['turns']),
-                        "op_time": 0,
+                        "op_time": self.calc_length(json_resp['time']),
                     })
             except Exception as e:
-                print(e)
+                self.power_is = 0
                 self.st.set_hank({
                     "state": 0,
                     "direction": 0,
@@ -83,7 +85,7 @@ class Handler:
                     })
             except Exception as e:
                 self.st.set_power({
-                    "state": 1,
+                    "state": int(self.power_is),
                     "voltage": 0,
                     "current": 0,
                 })

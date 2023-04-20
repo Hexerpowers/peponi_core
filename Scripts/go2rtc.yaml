@@ -1,6 +1,6 @@
 ffmpeg:
   h264: "-codec:v libx264 -g:v 30 -preset:v superfast -tune:v zerolatency -profile:v main -level:v 4.1 -fflags nobuffer -flags low_delay -timeout 5000000"
   myinput: "-fflags nobuffer -flags low_delay -timeout 5000000 -i {input}"
-  
+
 streams:
   cam_input: ffmpeg:rtsp://192.168.88.110/live.sdp#video=h264#hardware

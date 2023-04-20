@@ -1,9 +1,7 @@
-import math
-import time
 from threading import Thread
 
-from fastapi import FastAPI, Request
 import uvicorn
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 
