@@ -48,7 +48,7 @@ class Handler:
         while True:
             time.sleep(0.5)
             try:
-                req = requests.get('http://' + self.config['network']['hank_addr'], timeout=3)
+                req = requests.get('http://' + self.config['network']['hank_addr'], timeout=2)
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)
@@ -58,7 +58,7 @@ class Handler:
                         "direction": json_resp['direction'],
                         "load": self.calc_load(json_resp['load']),
                         "length": self.calc_length(json_resp['turns']),
-                        "op_time": self.calc_length(json_resp['time']),
+                        "op_time": json_resp['time'],
                     })
             except Exception as e:
                 self.power_is = 0
@@ -74,18 +74,20 @@ class Handler:
         while True:
             time.sleep(1)
             try:
-                req = requests.get('http://' + self.st.get_endp_addr() + ':5052/api/v1/get/power', timeout=2)
+                req = requests.get('http://' + self.st.get_endpoint_addr() + ':5052/api/v1/get/power', timeout=2)
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)
                     self.st.set_power({
                         "state": int(json_resp['state']),
                         "voltage": float(json_resp['voltage']),
-                        "current": float(json_resp['current']),
+                        "current_0": float(json_resp['current_0']),
+                        "current_1": float(json_resp['current_1']),
                     })
             except Exception as e:
                 self.st.set_power({
                     "state": int(self.power_is),
                     "voltage": 0,
-                    "current": 0,
+                    "current_0": 0,
+                    "current_1": 0
                 })

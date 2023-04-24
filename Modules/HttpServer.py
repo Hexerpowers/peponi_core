@@ -57,7 +57,8 @@ class HttpServer:
                 "status": "OK",
                 "state": self.st.get_power()['state'],
                 "voltage": self.st.get_power()['voltage'],
-                "current": self.st.get_power()['current']
+                "current_0": self.st.get_power()['current_0'],
+                "current_1": self.st.get_power()['current_1'],
             }
 
         @self.api.get("/api/v1/get/hank")
@@ -74,7 +75,7 @@ class HttpServer:
         async def post_path(data: Request):
             datum = await data.json()
             self.st.set_path(datum['camera_path'])
-            self.st.set_endp_addr(datum['endpoint_address'])
+            self.st.set_endpoint_addr(datum['endpoint_address'])
             return {
                 "status": "OK"
             }

@@ -16,13 +16,13 @@ class Store:
             "op_time": 0
         }
 
-        self.endp_addr = self.config['network']['endpoint_addr']
+        self.endpoint_addr = self.config['network']['endpoint_addr']
 
         self.manual = False
 
         self.record = False
 
-        self.path = "C:\Watchman\Camera"
+        self.path = "C:/Watchman/Camera"
 
     def toggle_manual(self):
         self.manual = not self.manual
@@ -42,8 +42,8 @@ class Store:
     def get_path(self):
         return self.path
 
-    def get_endp_addr(self):
-        return self.endp_addr
+    def get_endpoint_addr(self):
+        return self.endpoint_addr
 
     def get_record(self):
         return self.record
@@ -57,5 +57,5 @@ class Store:
     def set_path(self, path):
         self.path = path
 
-    def set_endp_addr(self, addr):
-        self.endp_addr = addr
+    def set_endpoint_addr(self, addr):
+        self.endpoint_addr = addr

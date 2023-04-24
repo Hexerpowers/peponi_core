@@ -37,6 +37,7 @@ try:
         time.sleep(1)
 except KeyboardInterrupt as e:
     LG.log('KeyboardInterrupt, остановлено пользователем')
+    LG.__del__()
     pid = 0
     for process in psutil.process_iter():
         if process.name() == 'go2rtc.exe':
