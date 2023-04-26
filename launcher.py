@@ -22,7 +22,8 @@ TR = HttpServer(config, ST, LG)
 NW = Network(config, ST, LG)
 
 script_path = os.path.dirname(os.path.abspath(__file__)) + '/Scripts/silent_start.vbs'
-command_line = os.path.dirname(os.path.abspath(__file__)) + '/Scripts/go2rtc.exe'
+command_line = os.path.dirname(
+    os.path.abspath(__file__)) + '/Scripts/go2rtc.exe -config C:/Users/Watchman/watchman_core/go2rtc.yaml'
 cmd = ['cscript', script_path, command_line]
 
 NW.wait_for_connection()
@@ -35,6 +36,19 @@ sp.Popen(cmd, stdout=sp.PIPE)
 try:
     while True:
         time.sleep(1)
+        running = True
+        # for process in psutil.process_iter():
+        #     if "СТРАЖ" in process.name():
+        #         running = False
+        # if running:
+        #     LG.log('KeyboardInterrupt, остановлено пользователем')
+        #     LG.__del__()
+        #     pid = 0
+        #     for process in psutil.process_iter():
+        #         if process.name() == 'go2rtc.exe':
+        #             pid = process.pid
+        #     console_ctrl.send_ctrl_c(pid)
+        #     break
 except KeyboardInterrupt as e:
     LG.log('KeyboardInterrupt, остановлено пользователем')
     LG.__del__()
