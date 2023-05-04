@@ -37,23 +37,6 @@ try:
     while True:
         time.sleep(1)
         running = True
-        # for process in psutil.process_iter():
-        #     if "СТРАЖ" in process.name():
-        #         running = False
-        # if running:
-        #     LG.log('KeyboardInterrupt, остановлено пользователем')
-        #     LG.__del__()
-        #     pid = 0
-        #     for process in psutil.process_iter():
-        #         if process.name() == 'go2rtc.exe':
-        #             pid = process.pid
-        #     console_ctrl.send_ctrl_c(pid)
-        #     break
 except KeyboardInterrupt as e:
     LG.log('KeyboardInterrupt, остановлено пользователем')
     LG.__del__()
-    pid = 0
-    for process in psutil.process_iter():
-        if process.name() == 'go2rtc.exe':
-            pid = process.pid
-    console_ctrl.send_ctrl_c(pid)
