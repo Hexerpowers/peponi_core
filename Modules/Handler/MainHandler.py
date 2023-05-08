@@ -48,7 +48,9 @@ class Handler:
         while True:
             time.sleep(0.5)
             try:
-                req = requests.get('http://' + self.config['network']['hank_addr'], timeout=2)
+                hank_params = self.st.get_hank_params()
+                req = requests.get('http://' + self.config['network']['hank_addr'] + "?pull_force=" + hank_params[
+                    'pull_force'] + "&free_length=" + hank_params['free_length'], timeout=2)
                 if req.status_code == 200:
                     raw_response = req.text
                     json_resp = json.loads(raw_response)

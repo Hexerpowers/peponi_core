@@ -3,9 +3,6 @@ import os
 import subprocess as sp
 import time
 
-import console_ctrl
-import psutil
-
 from Modules.Common.Logger import Logger
 from Modules.Common.Network import Network
 from Modules.Handler.MainHandler import Handler

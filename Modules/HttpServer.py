@@ -76,6 +76,11 @@ class HttpServer:
             datum = await data.json()
             self.st.set_path(datum['camera_path'])
             self.st.set_endpoint_addr(datum['endpoint_address'])
+            self.st.set_hank_params({
+                "pull_force": datum['pull_force'],
+                "free_length": datum['free_length'],
+            })
+
             return {
                 "status": "OK"
             }
