@@ -14,7 +14,10 @@ class Handler:
         self.config = config
         self.st = st
         self.lg = lg
-        self.power_is = 0
+
+        self.hank_power_ok = 0
+        self.hank_prev_target_length = 0
+
         self.hank_loop = Thread(target=self.hank, daemon=True, args=())
         self.power_loop = Thread(target=self.power, daemon=True, args=())
 
@@ -25,45 +28,101 @@ class Handler:
         VideoHandler(self.st, self.lg).start()
 
     @staticmethod
-    def calc_length(n):
-        n = float(n)
-        d = 0.006
-        l = 0.32
-        r = 0.275 / 2
-        k = int((n * d) / l)
-        if k > 0:
-            return round(((l / d) * 2 * math.pi * (((n * d) / l - k) * (r + k * d) + k * r + d * (k - 1))), 1)
+    def calc_length_by_turns(turns):
+        turns = float(turns)
+        cable_diam = 0.011
+        hank_width = 0.32
+        hank_rad = 0.275 / 2
+        layer = int((turns * cable_diam) / hank_width)
+        if layer > 0:
+            return round(((hank_width / cable_diam) * 2 * math.pi * (((turns * cable_diam) / hank_width - layer) * (
+                    hank_rad + layer * cable_diam) + layer * hank_rad + cable_diam * (layer - 1))), 1)
         else:
-            return round((2 * math.pi * r * n), 1)
+            return round((2 * math.pi * hank_rad * turns), 1)
 
     @staticmethod
-    def calc_load(m):
-        m = int(m)
-        if m < 0:
+    def calc_turns_by_length(target_length):
+        cable_diam = 0.011
+        hank_rad = 0.275 / 2
+
+        target_length = round(float(target_length))
+        if target_length < 4:
+            target_length = 4
+        target_length = target_length + target_length * 0.04
+
+        if 0 < target_length <= 25.918:
+            return target_length / (2 * math.pi * hank_rad)
+
+        if 25.918 < target_length <= 53.91:
+            return (target_length - 25.918) / (2 * math.pi * (hank_rad + 2 * cable_diam)) + 30
+
+        if 53.91 < target_length <= 83.97:
+            return (target_length - 53.91) / (2 * math.pi * (hank_rad + 4 * cable_diam)) + 60
+
+        if 83.97 <= target_length:
+            return (target_length - 83.97) / (2 * math.pi * (hank_rad + 6 * cable_diam)) + 90
+
+    @staticmethod
+    def calc_load(raw_load):
+        raw_load = int(raw_load)
+        if raw_load < 0:
             return 0
         else:
-            return round((m / 100000), 1)
+            return round((raw_load / 100000), 1)
 
     def hank(self):
         while True:
             time.sleep(0.5)
             try:
-                hank_params = self.st.get_hank_params()
-                req = requests.get('http://' + self.config['network']['hank_addr'] + "?pull_force=" + hank_params[
-                    'pull_force'] + "&free_length=" + hank_params['free_length'], timeout=2)
-                if req.status_code == 200:
-                    raw_response = req.text
-                    json_resp = json.loads(raw_response)
-                    self.power_is = 1
+                if self.st.config['hank']['mode'] == 'monitor':
+                    hank_params = self.st.get_hank_params()
+                    req = requests.get(
+                        'http://' + self.config['network']['default_hank_address'] + "?pull_force=" + hank_params[
+                            'pull_force'] + "&free_length=" + hank_params['free_length'], timeout=2)
+                    if req.status_code == 200:
+                        raw_response = req.text
+                        json_resp = json.loads(raw_response)
+                        self.hank_power_ok = 1
+                        self.st.set_hank({
+                            "state": 1,
+                            "direction": json_resp['direction'],
+                            "load": self.calc_load(json_resp['load']),
+                            "length": self.calc_length_by_turns(json_resp['turns']),
+                            "op_time": json_resp['time'],
+                        })
+
+                elif self.st.config['hank']['mode'] == 'target_length':
+                    hank_params = self.st.get_hank_params()
+                    target_length = round(self.calc_turns_by_length(hank_params['target_length']), 2)
+                    req = requests.get('http://' + self.config['network']['hank_addr'] +
+                                       "?target_length=" + target_length, timeout=2)
+                    if req.status_code == 200:
+                        if self.hank_prev_target_length > target_length:
+                            direction = -1
+                        else:
+                            direction = 1
+                        self.hank_prev_target_length = target_length
+
+                        self.hank_power_ok = 1
+                        self.st.set_hank({
+                            "state": 1,
+                            "direction": direction,
+                            "load": 2,
+                            "length": round(float(hank_params['target_length'])),
+                            "op_time": 10,
+                        })
+                else:
+                    self.hank_power_ok = 0
                     self.st.set_hank({
-                        "state": 1,
-                        "direction": json_resp['direction'],
-                        "load": self.calc_load(json_resp['load']),
-                        "length": self.calc_length(json_resp['turns']),
-                        "op_time": json_resp['time'],
+                        "state": 0,
+                        "direction": 0,
+                        "load": 0,
+                        "length": 0,
+                        "op_time": 0
                     })
-            except Exception as e:
-                self.power_is = 0
+
+            except Exception:
+                self.hank_power_ok = 0
                 self.st.set_hank({
                     "state": 0,
                     "direction": 0,
@@ -74,7 +133,7 @@ class Handler:
 
     def power(self):
         while True:
-            time.sleep(1)
+            time.sleep(0.5)
             try:
                 req = requests.get('http://' + self.st.get_endpoint_addr() + ':5052/api/v1/get/power', timeout=2)
                 if req.status_code == 200:
@@ -86,9 +145,9 @@ class Handler:
                         "current_0": float(json_resp['current_0']),
                         "current_1": float(json_resp['current_1']),
                     })
-            except Exception as e:
+            except Exception:
                 self.st.set_power({
-                    "state": int(self.power_is),
+                    "state": int(self.hank_power_ok),
                     "voltage": 0,
                     "current_0": 0,
                     "current_1": 0

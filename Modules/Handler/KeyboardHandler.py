@@ -101,9 +101,8 @@ class KeyboardHandler:
                     self.current_cmd = {"x": str(self.x), "y": str(self.y), "yaw": str(self.yaw),
                                         "cam_pitch": str(self.cam_pitch), "cam_zoom": str(self.cam_zoom)}
                     if self.current_cmd != self.prev_cmd:
-                        req = requests.post(
-                            'http://' + self.st.get_endpoint_addr() + ':5052/api/v1/post/move',
-                            data=json.dumps(self.current_cmd), timeout=2)
+                        requests.post('http://' + self.st.get_endpoint_addr() + ':5052/api/v1/post/move',
+                                      data=json.dumps(self.current_cmd), timeout=2)
                         self.prev_cmd = self.current_cmd
-                except Exception as e:
+                except Exception:
                     pass

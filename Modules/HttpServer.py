@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 
 import uvicorn
@@ -85,5 +86,19 @@ class HttpServer:
                 "status": "OK"
             }
 
-        self.lg.log("Принимаю запросы...")
-        uvicorn.run(self.api, host="0.0.0.0", port=5053, log_level="critical")
+        @self.api.post("/api/v1/post/hank_target_length")
+        async def post_hank_target_length(data: Request):
+            datum = await data.json()
+            self.st.set_hank_params({
+                "target_length": datum['target_length'],
+            })
+            return {
+                "status": "OK"
+            }
+
+        time.sleep(0.5)
+        self.lg.init("Инициализация завершена.")
+        if int(self.st.config['general']['show_errors']) == 1:
+            uvicorn.run(self.api, host="0.0.0.0", port=5053)
+        else:
+            uvicorn.run(self.api, host="0.0.0.0", port=5053, log_level="critical")

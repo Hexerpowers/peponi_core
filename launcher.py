@@ -20,7 +20,7 @@ NW = Network(config, ST, LG)
 
 script_path = os.path.dirname(os.path.abspath(__file__)) + '/Scripts/silent_start.vbs'
 command_line = os.path.dirname(
-    os.path.abspath(__file__)) + '/Scripts/go2rtc.exe -config C:/Users/Watchman/watchman_core/go2rtc.yaml'
+    os.path.abspath(__file__)) + '/Scripts/go2rtc.exe -config C:/Users/Watchman/watchman_core/Scripts/go2rtc.yaml'
 cmd = ['cscript', script_path, command_line]
 
 NW.wait_for_connection()
@@ -34,6 +34,6 @@ try:
     while True:
         time.sleep(1)
         running = True
-except KeyboardInterrupt as e:
+except KeyboardInterrupt:
     LG.log('KeyboardInterrupt, остановлено пользователем')
     LG.__del__()

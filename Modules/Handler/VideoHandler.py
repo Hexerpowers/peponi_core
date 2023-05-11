@@ -30,11 +30,13 @@ class VideoHandler:
         while True:
             if self.st.get_record():
                 if not self.running:
+                    camera_address = self.st.config['network']['default_camera_address']
                     save_path = self.st.get_path().replace('|', '/')
                     date = str(strftime("%Y-%m-%d_%H-%M-%S", gmtime()))
                     script_path = os.path.dirname(os.path.abspath(__file__)) + '../../../Scripts/silent_start.vbs'
                     command_line = 'C:/gstreamer/1.0/msvc_x86_64/bin/gst-launch-1.0.exe -e rtspsrc ' \
-                                   'location=rtsp://192.168.88.110/live.sdp ! decodebin ! x264enc ! mp4mux ! filesink' \
+                                   'location=rtsp://' + camera_address + \
+                                   '/live.sdp ! decodebin ! x264enc ! mp4mux ! filesink' \
                                    ' location="' + save_path + '/platform_rec_' + date + '.mp4"'
                     cmd = ['cscript', script_path, command_line]
                     self.vp = sp.Popen(cmd, stdout=sp.PIPE)
@@ -44,4 +46,4 @@ class VideoHandler:
                     pid = self.find_process_pid('gst-launch-1.0.exe')
                     console_ctrl.send_ctrl_c(pid)
                     self.running = False
-            time.sleep(0.1)
+            time.sleep(0.5)

@@ -5,7 +5,8 @@ class Store:
         self.power = {
             "state": 0,
             "voltage": 0,
-            "current": 0
+            "current_0": 0,
+            "current_1": 0
         }
 
         self.hank = {
@@ -18,10 +19,12 @@ class Store:
 
         self.hank_params = {
             "pull_force": 0,
-            "free_length": 3
+            "free_length": 3,
+            "target_length": 0
+
         }
 
-        self.endpoint_addr = self.config['network']['endpoint_addr']
+        self.endpoint_addr = self.config['network']['default_endpoint_address']
 
         self.manual = False
 
