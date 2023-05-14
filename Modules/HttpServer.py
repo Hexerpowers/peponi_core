@@ -73,15 +73,21 @@ class HttpServer:
             }
 
         @self.api.post("/api/v1/post/settings")
-        async def post_path(data: Request):
+        async def post_settings(data: Request):
             datum = await data.json()
             self.st.set_path(datum['camera_path'])
-            self.st.set_endpoint_addr(datum['endpoint_address'])
-            self.st.set_hank_params({
-                "pull_force": datum['pull_force'],
-                "free_length": datum['free_length'],
-            })
+            self.st.set_hank_params("pull_force", int(datum['pull_force']))
+            self.st.set_hank_params("free_length", float(datum['free_length']))
 
+            return {
+                "status": "OK"
+            }
+
+        @self.api.post("/api/v1/post/dev_settings")
+        async def post_dev_settings(data: Request):
+            datum = await data.json()
+            self.st.set_endpoint_addr(datum['endpoint_address'])
+            self.st.set_hank_params("mode", int(datum['hank_mode']))
             return {
                 "status": "OK"
             }
@@ -89,9 +95,7 @@ class HttpServer:
         @self.api.post("/api/v1/post/hank_target_length")
         async def post_hank_target_length(data: Request):
             datum = await data.json()
-            self.st.set_hank_params({
-                "target_length": datum['target_length'],
-            })
+            self.st.set_hank_params("target_length", int(datum['target_length']))
             return {
                 "status": "OK"
             }

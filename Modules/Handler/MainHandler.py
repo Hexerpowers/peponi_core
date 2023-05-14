@@ -74,11 +74,12 @@ class Handler:
         while True:
             time.sleep(0.5)
             try:
-                if self.st.config['hank']['mode'] == 'monitor':
+                if int(self.st.get_hank_params()['mode']) == 1:
                     hank_params = self.st.get_hank_params()
                     req = requests.get(
-                        'http://' + self.config['network']['default_hank_address'] + "?pull_force=" + hank_params[
-                            'pull_force'] + "&free_length=" + hank_params['free_length'], timeout=2)
+                        'http://' + self.config['network']['default_hank_address'] + "?pull_force=" + str(
+                            10 + int(hank_params['pull_force'])) + "&free_length=" + hank_params['free_length']+"&",
+                        timeout=2)
                     if req.status_code == 200:
                         raw_response = req.text
                         json_resp = json.loads(raw_response)
@@ -91,7 +92,7 @@ class Handler:
                             "op_time": json_resp['time'],
                         })
 
-                elif self.st.config['hank']['mode'] == 'target_length':
+                elif int(self.st.get_hank_params()['mode']) == 2:
                     hank_params = self.st.get_hank_params()
                     target_length = round(self.calc_turns_by_length(hank_params['target_length']), 2)
                     req = requests.get('http://' + self.config['network']['hank_addr'] +

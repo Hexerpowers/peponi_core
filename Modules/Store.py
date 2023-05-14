@@ -20,8 +20,8 @@ class Store:
         self.hank_params = {
             "pull_force": 0,
             "free_length": 3,
-            "target_length": 0
-
+            "target_length": 0,
+            "mode": int(config['hank']['mode'])
         }
 
         self.endpoint_addr = self.config['network']['default_endpoint_address']
@@ -71,5 +71,5 @@ class Store:
     def set_endpoint_addr(self, addr):
         self.endpoint_addr = addr
 
-    def set_hank_params(self, hank_params):
-        self.hank_params = hank_params
+    def set_hank_params(self, name, value):
+        self.hank_params[name] = value
