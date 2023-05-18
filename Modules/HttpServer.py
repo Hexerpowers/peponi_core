@@ -92,10 +92,11 @@ class HttpServer:
                 "status": "OK"
             }
 
-        @self.api.post("/api/v1/post/hank_target_length")
+        @self.api.post("/api/v1/post/hank_target")
         async def post_hank_target_length(data: Request):
             datum = await data.json()
             self.st.set_hank_params("target_length", int(datum['target_length']))
+            self.st.set_hank_params("target_mode", int(datum['target_mode']))
             return {
                 "status": "OK"
             }

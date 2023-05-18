@@ -78,7 +78,8 @@ class Handler:
                     hank_params = self.st.get_hank_params()
                     req = requests.get(
                         'http://' + self.config['network']['default_hank_address'] + "?pull_force=" + str(
-                            10 + int(hank_params['pull_force'])) + "&free_length=" + hank_params['free_length']+"&",
+                            10 + int(hank_params['pull_force'])) + "&free_length=" + str(
+                            hank_params['free_length']) + "&",
                         timeout=2)
                     if req.status_code == 200:
                         raw_response = req.text
@@ -95,22 +96,22 @@ class Handler:
                 elif int(self.st.get_hank_params()['mode']) == 2:
                     hank_params = self.st.get_hank_params()
                     target_length = round(self.calc_turns_by_length(hank_params['target_length']), 2)
-                    req = requests.get('http://' + self.config['network']['hank_addr'] +
-                                       "?target_length=" + target_length, timeout=2)
+                    req = requests.get(
+                        'http://' + self.config['network']['default_hank_address'] + "?pull_force=" + str(
+                            10 + int(hank_params['pull_force'])) + "&free_length=" + str(
+                            hank_params['free_length']) + "&target_length=" + str(
+                            target_length) + "&target_mode=" + str(hank_params['target_mode']) + "&",
+                        timeout=2)
                     if req.status_code == 200:
-                        if self.hank_prev_target_length > target_length:
-                            direction = -1
-                        else:
-                            direction = 1
-                        self.hank_prev_target_length = target_length
-
+                        raw_response = req.text
+                        json_resp = json.loads(raw_response)
                         self.hank_power_ok = 1
                         self.st.set_hank({
                             "state": 1,
-                            "direction": direction,
-                            "load": 2,
-                            "length": round(float(hank_params['target_length'])),
-                            "op_time": 10,
+                            "direction": json_resp['direction'],
+                            "load": self.calc_load(json_resp['load']),
+                            "length": self.calc_length_by_turns(json_resp['turns']),
+                            "op_time": json_resp['time'],
                         })
                 else:
                     self.hank_power_ok = 0
