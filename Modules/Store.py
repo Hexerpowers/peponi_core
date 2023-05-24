@@ -22,6 +22,7 @@ class Store:
             "free_length": 3,
             "target_length": 0,
             "target_mode": 0,
+            "target_alt": 0,
             "mode": int(config['hank']['mode'])
         }
 

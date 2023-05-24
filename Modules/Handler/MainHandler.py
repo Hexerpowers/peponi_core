@@ -100,8 +100,9 @@ class Handler:
                         'http://' + self.config['network']['default_hank_address'] + "?pull_force=" + str(
                             10 + int(hank_params['pull_force'])) + "&free_length=" + str(
                             hank_params['free_length']) + "&target_length=" + str(
-                            target_length) + "&target_mode=" + str(hank_params['target_mode']) + "&",
-                        timeout=2)
+                            target_length) + "&target_mode=" + str(hank_params['target_mode']) + "&target_alt=" + str(
+                            hank_params['target_alt']) + "&",
+                        timeout=3)
                     if req.status_code == 200:
                         raw_response = req.text
                         json_resp = json.loads(raw_response)

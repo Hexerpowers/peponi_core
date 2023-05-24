@@ -97,6 +97,7 @@ class HttpServer:
             datum = await data.json()
             self.st.set_hank_params("target_length", int(datum['target_length']))
             self.st.set_hank_params("target_mode", int(datum['target_mode']))
+            self.st.set_hank_params("target_alt", int(datum['target_alt']))
             return {
                 "status": "OK"
             }

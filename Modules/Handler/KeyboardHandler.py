@@ -5,9 +5,13 @@ from threading import Thread
 import keyboard
 import requests
 
+import py_win_keyboard_layout
+
 
 class KeyboardHandler:
     def __init__(self, st, lg):
+
+        py_win_keyboard_layout.change_foreground_window_keyboard_layout(0x04090409)
 
         self.st = st
         self.lg = lg
