@@ -30,7 +30,7 @@ class Handler:
     @staticmethod
     def calc_length_by_turns(turns):
         turns = float(turns)
-        cable_diam = 0.011
+        cable_diam = 0.08
         hank_width = 0.32
         hank_rad = 0.275 / 2
         layer = int((turns * cable_diam) / hank_width)
@@ -42,7 +42,7 @@ class Handler:
 
     @staticmethod
     def calc_turns_by_length(target_length):
-        cable_diam = 0.011
+        cable_diam = 0.08
         hank_rad = 0.275 / 2
 
         target_length = round(float(target_length))

@@ -54,14 +54,14 @@ class KeyboardHandler:
         if e.event_type == 'up' and e.name == 'l':
             self.cam_pitch = 0
 
-        if e.event_type == 'down' and e.name == ',':
+        if e.event_type == 'down' and e.name == '.':
             self.yaw = 1
-        if e.event_type == 'up' and e.name == ',':
+        if e.event_type == 'up' and e.name == '.':
             self.yaw = 0
 
-        if e.event_type == 'down' and e.name == '.':
+        if e.event_type == 'down' and e.name == ',':
             self.yaw = -1
-        if e.event_type == 'up' and e.name == '.':
+        if e.event_type == 'up' and e.name == ',':
             self.yaw = 0
 
         if e.event_type == 'down' and e.name == 'up':
