@@ -1,16 +1,20 @@
 import json
 import math
+import socket
 import time
 from threading import Thread
 
 import requests
+from Modules.Common.Logger import Logger
+
+from Modules.Store import Store
 
 from Modules.Handler.KeyboardHandler import KeyboardHandler
 from Modules.Handler.VideoHandler import VideoHandler
 
 
 class Handler:
-    def __init__(self, config, st, lg):
+    def __init__(self, config, st: Store, lg: Logger):
         self.config = config
         self.st = st
         self.lg = lg
@@ -21,8 +25,22 @@ class Handler:
         self.hank_loop = Thread(target=self.hank, daemon=True, args=())
         self.power_loop = Thread(target=self.power, daemon=True, args=())
 
+        self.remote_address = config['network']['default_hank_address']
+        self.data_port = 700
+        self.tx_thread = Thread(target=self.tx_void, daemon=True, args=())
+        self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.ready = True
+        self.lg.init('[TX] Подключаюсь к сокету: ' + str((self.remote_address, self.data_port)))
+        try:
+            self.tx_socket.connect((self.remote_address, self.data_port))
+        except Exception as e:
+            self.lg.error('[TX] Ошибка подключения к сокету: ' + str(e))
+            self.ready = False
+
     def start(self):
-        self.hank_loop.start()
+        if self.ready:
+            self.tx_thread.start()
+            self.lg.log('[MX] Подключение к ' + str((self.remote_address, self.data_port)) + ': успешно.')
         self.power_loop.start()
         KeyboardHandler(self.st, self.lg).start()
         VideoHandler(self.st, self.lg).start()
@@ -69,6 +87,21 @@ class Handler:
             return 0
         else:
             return round((raw_load / 100000), 1)
+
+    def tx_void(self):
+        while True:
+            try:
+                while True:
+                    drop = "1" if self.st.get_drop() else "0"
+                    self.tx_socket.sendall(json.dumps({'drop' : str(drop)}).encode('utf-8'))
+                    data = self.tx_socket.recv(128)
+                    print(data)
+                    time.sleep(0.01)
+                    if drop == "1":
+                        self.st.set_drop(False)
+            except Exception as e:
+                self.lg.error('[TX] Ошибка подключения или передачи: ' + str(e))
+            time.sleep(1)
 
     def hank(self):
         while True:

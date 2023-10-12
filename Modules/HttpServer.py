@@ -34,6 +34,13 @@ class HttpServer:
                 "status": "OK"
             }
 
+        @self.api.get("/api/v1/trig/drop")
+        async def trig_drop():
+            self.st.toggle_drop()
+            return {
+                "status": "OK"
+            }
+
         @self.api.get("/api/v1/trig/record")
         async def trig_record():
             self.st.toggle_record()
@@ -50,6 +57,13 @@ class HttpServer:
         async def get_status():
             return {
                 "status": "OK"
+            }
+
+        @self.api.get("/api/v1/get/info")
+        async def get_status():
+            return {
+                "status": "OK",
+                "core_version": "1.1.0"
             }
 
         @self.api.get("/api/v1/get/power")

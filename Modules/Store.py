@@ -31,11 +31,15 @@ class Store:
         self.manual = False
 
         self.record = False
+        self.drop = False
 
         self.path = "C:/Watchman/Camera"
 
     def toggle_manual(self):
         self.manual = not self.manual
+
+    def toggle_drop(self):
+        self.drop = True
 
     def toggle_record(self):
         self.record = not self.record
@@ -58,6 +62,9 @@ class Store:
     def get_record(self):
         return self.record
 
+    def get_drop(self):
+        return self.drop
+
     def get_hank_params(self):
         return self.hank_params
 
@@ -69,6 +76,9 @@ class Store:
 
     def set_path(self, path):
         self.path = path
+
+    def set_drop(self, state):
+        self.drop = state
 
     def set_endpoint_addr(self, addr):
         self.endpoint_addr = addr
