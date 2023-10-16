@@ -3,9 +3,8 @@ import time
 from threading import Thread
 
 import keyboard
-import requests
-
 import py_win_keyboard_layout
+import requests
 
 
 class KeyboardHandler:

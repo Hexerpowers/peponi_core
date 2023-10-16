@@ -25,10 +25,9 @@ cmd = ['cscript', script_path, command_line]
 
 NW.wait_for_connection()
 
-HD.start()
 TR.start()
-
 sp.Popen(cmd, stdout=sp.PIPE)
+HD.start()
 
 try:
     while True:

@@ -4,13 +4,13 @@ import socket
 import time
 from threading import Thread
 
+import pythonping
 import requests
+
 from Modules.Common.Logger import Logger
-
-from Modules.Store import Store
-
 from Modules.Handler.KeyboardHandler import KeyboardHandler
 from Modules.Handler.VideoHandler import VideoHandler
+from Modules.Store import Store
 
 
 class Handler:
@@ -24,30 +24,20 @@ class Handler:
 
         self.hank_loop = Thread(target=self.hank, daemon=True, args=())
         self.power_loop = Thread(target=self.power, daemon=True, args=())
-
-        self.remote_address = config['network']['default_hank_address']
-        self.data_port = 700
-        self.tx_thread = Thread(target=self.tx_void, daemon=True, args=())
-        self.tx_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.ready = True
-        self.lg.init('[TX] Подключаюсь к сокету: ' + str((self.remote_address, self.data_port)))
-        try:
-            self.tx_socket.connect((self.remote_address, self.data_port))
-        except Exception as e:
-            self.lg.error('[TX] Ошибка подключения к сокету: ' + str(e))
-            self.ready = False
+        self.hank_tcp_void = Thread(target=self.tx_void, daemon=True, args=())
 
     def start(self):
-        if self.ready:
-            self.tx_thread.start()
-            self.lg.log('[MX] Подключение к ' + str((self.remote_address, self.data_port)) + ': успешно.')
         self.power_loop.start()
+        self.hank_tcp_void.start()
         KeyboardHandler(self.st, self.lg).start()
         VideoHandler(self.st, self.lg).start()
 
     @staticmethod
     def calc_length_by_turns(turns):
         turns = float(turns)
+        turns = round(turns/-65535, 1)
+        return turns
+
         cable_diam = 0.08
         hank_width = 0.32
         hank_rad = 0.275 / 2
@@ -83,25 +73,89 @@ class Handler:
     @staticmethod
     def calc_load(raw_load):
         raw_load = int(raw_load)
-        if raw_load < 0:
-            return 0
+        raw_load *= -1
+        raw_load -= 100
+        val = round((raw_load / 12), 1)
+        if val > 0:
+            return val
         else:
-            return round((raw_load / 100000), 1)
+            return 0
 
     def tx_void(self):
         while True:
             try:
+                tx_socket = None
+                self.lg.init('Ожидаю подключения приложения...')
+
                 while True:
-                    drop = "1" if self.st.get_drop() else "0"
-                    self.tx_socket.sendall(json.dumps({'drop' : str(drop)}).encode('utf-8'))
-                    data = self.tx_socket.recv(128)
-                    print(data)
-                    time.sleep(0.01)
-                    if drop == "1":
-                        self.st.set_drop(False)
+                    if not self.st.connected:
+                        continue
+                    if int(self.st.get_hank_params()['mode']) != 1:
+                        self.lg.init('Катушка в автономном режиме...')
+                        return
+
+                    remote_address = self.config['network']['default_hank_address']
+                    data_port = 502
+                    tx_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    self.lg.init('Подключаюсь к УМ катушки...')
+
+                    try:
+                        while True:
+                            try:
+                                response_list = pythonping.ping(remote_address, size=20, count=2, timeout=2)
+                                if int(response_list.rtt_avg_ms) < 100:
+                                    break
+                            except Exception as e:
+                                time.sleep(0.1)
+
+                        tx_socket.connect((remote_address, data_port))
+                        self.lg.init('Подключение к УМ катушки: успешно.')
+                        break
+                    except Exception as e:
+                        self.lg.error('Ошибка подключения к УМ катушки: ' + str(e))
+                        return
+
+                while True:
+                    direction = 0
+                    try:
+                        while True:
+                            drop = "drop" if self.st.get_drop() else "hui"
+                            tx_socket.sendall(drop.encode('utf-8'))
+                            data = tx_socket.recv(128)
+                            data = data.decode('utf-8').split('#')
+                            self.hank_power_ok = 1
+                            self.st.set_hank({
+                                "state": 1,
+                                "direction": 1 if direction > int(data[0]) else 2,
+                                "load": self.calc_load(data[1]),
+                                "length": self.calc_length_by_turns(data[0]),
+                                "op_time": 0,
+                            })
+                            direction = int(data[0])
+                            time.sleep(0.01)
+                            if self.st.get_drop():
+                                self.st.set_drop(False)
+                    except Exception as e:
+                        self.lg.error('Ошибка передачи УМ катушки: ' + str(e))
+                        tx_socket.close()
+                        self.hank_power_ok = 0
+                        self.st.set_hank({
+                            "state": 0,
+                            "direction": 0,
+                            "load": 0,
+                            "length": 0,
+                            "op_time": 0
+                        })
+                        break
             except Exception as e:
-                self.lg.error('[TX] Ошибка подключения или передачи: ' + str(e))
-            time.sleep(1)
+                self.hank_power_ok = 0
+                self.st.set_hank({
+                    "state": 0,
+                    "direction": 0,
+                    "load": 0,
+                    "length": 0,
+                    "op_time": 0
+                })
 
     def hank(self):
         while True:

@@ -12,7 +12,7 @@
       <paths name="pi@hank">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/pi/endpoint" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/gamma_copter/watchman_endpoint" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

@@ -23,7 +23,7 @@ class Network:
                     for subnet in subnets:
                         if subnet in addr:
                             local_addresses.append(addr)
-            if len(local_addresses)>0:
+            if len(local_addresses) > 0:
                 net_available = True
                 for addr in local_addresses:
                     self.lg.init("Сетевое подключение [" + str(addr) + "] обнаружено.")

@@ -33,6 +33,8 @@ class Store:
         self.record = False
         self.drop = False
 
+        self.connected = False
+
         self.path = "C:/Watchman/Camera"
 
     def toggle_manual(self):
@@ -85,3 +87,6 @@ class Store:
 
     def set_hank_params(self, name, value):
         self.hank_params[name] = value
+
+    def set_connected(self):
+        self.connected = True

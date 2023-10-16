@@ -63,7 +63,7 @@ class HttpServer:
         async def get_status():
             return {
                 "status": "OK",
-                "core_version": "1.1.0"
+                "core_version": "1.2.2"
             }
 
         @self.api.get("/api/v1/get/power")
@@ -102,6 +102,7 @@ class HttpServer:
             datum = await data.json()
             self.st.set_endpoint_addr(datum['endpoint_address'])
             self.st.set_hank_params("mode", int(datum['hank_mode']))
+            self.st.set_connected()
             return {
                 "status": "OK"
             }
