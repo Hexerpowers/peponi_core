@@ -2,13 +2,6 @@
 <project version="4">
   <component name="PublishConfigData" serverName="pi@hank" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="jet@192.168.88.252:22 password">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="pi@hank">
         <serverdata>
           <mappings>

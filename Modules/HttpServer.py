@@ -56,7 +56,8 @@ class HttpServer:
         @self.api.get("/api/v1/get/status")
         async def get_status():
             return {
-                "status": "OK"
+                "status": "OK",
+                "address": self.st.get_endpoint_addr()
             }
 
         @self.api.get("/api/v1/get/info")
