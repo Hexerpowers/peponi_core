@@ -64,7 +64,7 @@ class HttpServer:
         async def get_status():
             return {
                 "status": "OK",
-                "core_version": "1.2.2"
+                "core_version": str(self.config['general']['rev_version'])
             }
 
         @self.api.get("/api/v1/get/power")
@@ -101,7 +101,6 @@ class HttpServer:
         @self.api.post("/api/v1/post/dev_settings")
         async def post_dev_settings(data: Request):
             datum = await data.json()
-            self.st.set_endpoint_addr(datum['endpoint_address'])
             self.st.set_hank_params("mode", int(datum['hank_mode']))
             self.st.set_connected()
             return {
@@ -119,6 +118,7 @@ class HttpServer:
             }
 
         time.sleep(0.5)
+        self.lg.init("Версия приложения: "+str(self.config['general']['rev_version']))
         self.lg.init("Инициализация завершена.")
         if int(self.st.config['general']['show_errors']) == 1:
             uvicorn.run(self.api, host="0.0.0.0", port=5053)
