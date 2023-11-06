@@ -2,6 +2,7 @@ import socket
 import time
 from threading import Thread
 
+import pythonping
 from netifaces import interfaces, ifaddresses, AF_INET
 
 from Modules.Common.Logger import Logger
@@ -19,14 +20,22 @@ class Network:
         self.rpi_hostname_loop = Thread(target=self.update_rpi_hostname, daemon=True, args=())
 
     def update_rpi_hostname(self):
+        hostname = self.config['network']['default_endpoint_address']
         while True:
-            time.sleep(1)
+            time.sleep(0.8)
             try:
-                hostname = socket.gethostbyname(self.config['network']['default_endpoint_hostname'])
                 if not self.found_shown:
-                    self.lg.log("Найден коптер по адресу: %s" % hostname)
-                    self.found_shown = True
+                    hostname = socket.gethostbyname(self.config['network']['default_endpoint_hostname'])
+                    if not self.found_shown:
+                        self.lg.log("Найден коптер по адресу: %s" % hostname)
+                        self.found_shown = True
+                else:
+                    response_list = pythonping.ping(self.st.get_endpoint_addr(), size=20, count=2,
+                                                    timeout=2)
+                    if int(response_list.rtt_avg_ms) > 200:
+                        self.found_shown = False
             except Exception as e:
+                print(e)
                 hostname = self.config['network']['default_endpoint_address']
                 self.found_shown = False
 
